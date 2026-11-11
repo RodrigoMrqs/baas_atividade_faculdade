@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Administrador = existe um documento admins/{uid}.
+    // Crie esse documento manualmente no console para o UID do admin.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isVisitor() {
+      return request.auth != null;
+    }
+
+    match /admins/{uid} {
+      // Cada usuário só consegue checar se ele próprio é admin; ninguém escreve pelo cliente.
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    match /estandes/{estandeId} {
+      // get: o app precisa distinguir "inexistente" de "inativo" ao ler o QR.
+      // list: visitantes só enxergam a lista de estandes ativos.
+      allow get: if isAdmin() || isVisitor();
+      allow list: if isAdmin() || (isVisitor() && resource.data.ativo == true);
+      allow create, update: if isAdmin()
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.ativo is bool;
+      allow delete: if isAdmin();
+    }
+
+    match /checkins/{checkinId} {
+      // O app usa o id composto "{visitanteId}_{estandeId}": impede duplicatas.
+      allow create: if isVisitor()
+        && request.resource.data.visitanteId == request.auth.uid
+        && request.resource.data.estandeId is string
+        && checkinId == request.auth.uid + '_' + request.resource.data.estandeId
+        && request.resource.data.keys().hasOnly(['visitanteId', 'estandeId', 'criadoEm'])
+        && request.resource.data.criadoEm == request.time
+        && get(/databases/$(database)/documents/estandes/$(request.resource.data.estandeId)).data.ativo == true;
+
+      // Admin lê tudo (totais); visitante só vê o próprio registro (detectar "já registrada").
+      allow read: if isAdmin()
+        || (isVisitor() && (resource == null || resource.data.visitanteId == request.auth.uid));
+
+      allow update, delete: if false;
+    }
+  }
+}

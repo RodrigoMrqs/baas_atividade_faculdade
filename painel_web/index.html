@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circuito de Descobertas — Painel</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+</head>
+<body>
+  <!-- LOGIN -->
+  <section id="tela-login" class="centro" hidden>
+    <form id="form-login" class="cartao estreito">
+      <h1>Circuito de Descobertas</h1>
+      <p class="mudo">Painel da organização — Amazon Hacking</p>
+      <label>E-mail <input type="email" id="login-email" required autocomplete="username"></label>
+      <label>Senha <input type="password" id="login-senha" required autocomplete="current-password"></label>
+      <button type="submit" class="primario">Entrar</button>
+      <p id="login-erro" class="erro" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- NEGADO -->
+  <section id="tela-negado" class="centro" hidden>
+    <div class="cartao estreito">
+      <h1>Acesso negado</h1>
+      <p>Este usuário não é administrador. Crie o documento <code>admins/<span id="uid-negado"></span></code> no Firestore.</p>
+      <button id="btn-sair-negado">Sair</button>
+    </div>
+  </section>
+
+  <!-- PAINEL -->
+  <main id="tela-painel" hidden>
+    <header class="topo">
+      <div>
+        <h1>Circuito de Descobertas</h1>
+        <span class="mudo" id="usuario"></span>
+      </div>
+      <div class="acoes">
+        <button id="btn-seed">Criar 3 estandes de exemplo</button>
+        <button id="btn-novo" class="primario">+ Novo estande</button>
+        <button id="btn-sair">Sair</button>
+      </div>
+    </header>
+
+    <section class="resumo">
+      <div class="kpi"><span id="kpi-total">0</span><small>check-ins confirmados</small></div>
+      <div class="kpi"><span id="kpi-estandes">0</span><small>estandes ativos</small></div>
+      <div class="kpi"><span id="kpi-visitantes">0</span><small>visitantes únicos</small></div>
+    </section>
+
+    <section class="cartao">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Estande</th><th>Localização</th><th>Estado</th><th class="num">Check-ins</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+      <p id="vazio" class="mudo" hidden>Nenhum estande cadastrado.</p>
+    </section>
+  </main>
+
+  <!-- MODAL EDITAR -->
+  <dialog id="dlg-estande">
+    <form id="form-estande" method="dialog">
+      <h2 id="dlg-titulo">Novo estande</h2>
+      <label>ID (usado no QR code)
+        <input id="f-id" placeholder="gerado automaticamente" pattern="[A-Za-z0-9_-]*" title="Letras, números, _ e -">
+      </label>
+      <label>Nome <input id="f-nome" required maxlength="80"></label>
+      <label>Descrição breve <textarea id="f-desc" rows="3" maxlength="240"></textarea></label>
+      <label>Localização <input id="f-local" maxlength="80" placeholder="Ex.: Corredor B, bancada 4"></label>
+      <label class="linha"><input type="checkbox" id="f-ativo" checked> Estande ativo</label>
+      <p id="f-erro" class="erro" role="alert"></p>
+      <div class="acoes">
+        <button type="button" id="f-cancelar">Cancelar</button>
+        <button type="submit" class="primario">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL QR -->
+  <dialog id="dlg-qr">
+    <div class="qr-box">
+      <h2 id="qr-nome"></h2>
+      <div id="qr-img"></div>
+      <code id="qr-id"></code>
+      <div class="acoes">
+        <button id="qr-abrir">Abrir em outra tela</button>
+        <button id="qr-imprimir">Imprimir</button>
+        <button id="qr-fechar">Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

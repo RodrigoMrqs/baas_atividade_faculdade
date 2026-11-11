@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "missao_ativa": {
+      "defaultValue": { "value": "false" },
+      "valueType": "BOOLEAN",
+      "description": "Liga/desliga a missão surpresa no app"
+    },
+    "missao_estandes": {
+      "defaultValue": { "value": "" },
+      "valueType": "STRING",
+      "description": "IDs dos estandes destacados, separados por vírgula (ex: e01,e03)"
+    }
+  }
+}
